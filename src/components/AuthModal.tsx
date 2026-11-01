@@ -113,27 +113,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </svg>
               <span>{isLoggingIn ? 'กำลังเชื่อมต่อ Google...' : 'เข้าสู่ระบบ Google Login'}</span>
             </button>
-
-            {onMockSignIn && (
-              <div className="pt-2">
-                <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-slate-200"></div>
-                  <span className="shrink-0 mx-2 text-2xs text-slate-400 uppercase font-semibold">หรือทดสอบระบบ</span>
-                  <div className="flex-grow border-t border-slate-200"></div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onMockSignIn('superadmin', 'director@bnr.ac.th', 'ผู้อำนวยการโรงเรียน (Super Admin)');
-                    onClose();
-                  }}
-                  className="w-full py-2.5 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-xl text-amber-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
-                >
-                  <Crown className="w-4 h-4 text-amber-600" />
-                  <span>เข้าสู่ระบบทันที (Director / Super Admin)</span>
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="pt-2 border-t border-slate-100 flex justify-center">
