@@ -1,0 +1,258 @@
+{
+  "entities": {
+    "SchoolInfo": {
+      "title": "SchoolInfo",
+      "description": "General school identity, vision, mission, history, and contact details",
+      "type": "object",
+      "properties": {
+        "schoolName": { "type": "string", "maxLength": 200 },
+        "schoolNameEn": { "type": "string", "maxLength": 200 },
+        "motto": { "type": "string", "maxLength": 300 },
+        "vision": { "type": "string", "maxLength": 2000 },
+        "mission": { "type": "string", "maxLength": 2000 },
+        "history": { "type": "string", "maxLength": 5000 },
+        "identity": { "type": "string", "maxLength": 500 },
+        "uniqueness": { "type": "string", "maxLength": 500 },
+        "directorName": { "type": "string", "maxLength": 150 },
+        "directorMessage": { "type": "string", "maxLength": 3000 },
+        "directorImageUrl": { "type": "string", "maxLength": 1000 },
+        "address": { "type": "string", "maxLength": 500 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 100 },
+        "facebookUrl": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["schoolName", "motto", "vision"]
+    },
+    "StaffMember": {
+      "title": "StaffMember",
+      "description": "Teachers, administrators, and educational support personnel",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "prefix": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "position": { "type": "string", "maxLength": 100 },
+        "academicRank": { "type": "string", "maxLength": 100 },
+        "department": { "type": "string", "maxLength": 100 },
+        "roleCategory": { "type": "string", "enum": ["executive", "teacher", "support"] },
+        "email": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "order": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "position", "department", "roleCategory"]
+    },
+    "BoardMember": {
+      "title": "BoardMember",
+      "description": "Basic Education Board and Parents Network Committee members",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 150 },
+        "boardType": { "type": "string", "enum": ["basic_education", "parents_network"] },
+        "roleInBoard": { "type": "string", "maxLength": 100 },
+        "representation": { "type": "string", "maxLength": 150 },
+        "occupation": { "type": "string", "maxLength": 150 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "order": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "boardType", "roleInBoard"]
+    },
+    "NewsPost": {
+      "title": "NewsPost",
+      "description": "School news, announcements, press releases, and articles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 300 },
+        "category": { "type": "string", "enum": ["news", "announcement", "procurement", "academic"] },
+        "summary": { "type": "string", "maxLength": 1000 },
+        "content": { "type": "string", "maxLength": 20000 },
+        "coverImage": { "type": "string", "maxLength": 1000 },
+        "authorName": { "type": "string", "maxLength": 150 },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "driveFileId": { "type": "string", "maxLength": 200 },
+        "driveFileName": { "type": "string", "maxLength": 300 },
+        "driveFileUrl": { "type": "string", "maxLength": 1000 },
+        "published": { "type": "boolean" },
+        "pinned": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "content", "authorId"]
+    },
+    "GalleryAlbum": {
+      "title": "GalleryAlbum",
+      "description": "School activity photo gallery albums",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 300 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "activityDate": { "type": "string", "maxLength": 50 },
+        "coverImage": { "type": "string", "maxLength": 1000 },
+        "images": { "type": "array" },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "coverImage", "authorId"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authorized staff and administrator accounts",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 100 },
+        "displayName": { "type": "string", "maxLength": 150 },
+        "photoURL": { "type": "string", "maxLength": 1000 },
+        "role": { "type": "string", "enum": ["admin", "teacher"] },
+        "department": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "System admin verification entry matching auth UID",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 100 },
+        "grantedBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "DriveSettings": {
+      "title": "DriveSettings",
+      "description": "Central school Google Drive folder configuration and department shortcuts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "centralFolderId": { "type": "string", "maxLength": 200 },
+        "centralFolderName": { "type": "string", "maxLength": 200 },
+        "centralFolderUrl": { "type": "string", "maxLength": 1000 },
+        "sharedDriveName": { "type": "string", "maxLength": 200 },
+        "allowPublicDownload": { "type": "boolean" },
+        "folders": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["centralFolderName"]
+    },
+    "SiteStats": {
+      "title": "SiteStats",
+      "description": "Aggregated website hit statistics and visitor counters",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "totalVisits": { "type": "number" },
+        "todayVisits": { "type": "number" },
+        "lastVisitedAt": { "type": "string", "format": "date-time" },
+        "lastDate": { "type": "string", "maxLength": 20 },
+        "resetAt": { "type": "string", "format": "date-time" },
+        "resetBy": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["totalVisits"]
+    },
+    "VideoItem": {
+      "title": "VideoItem",
+      "description": "School activity videos and multimedia clips",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 300 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "videoUrl": { "type": "string", "maxLength": 1000 },
+        "thumbnailUrl": { "type": "string", "maxLength": 1000 },
+        "youtubeId": { "type": "string", "maxLength": 50 },
+        "driveFileId": { "type": "string", "maxLength": 200 },
+        "driveFolderId": { "type": "string", "maxLength": 200 },
+        "duration": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 100 },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["title", "videoUrl", "published"]
+    },
+    "PublicDocument": {
+      "title": "PublicDocument",
+      "description": "School public documents, SAR reports, and regulations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 300 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "academicYear": { "type": "string", "maxLength": 50 },
+        "department": { "type": "string", "maxLength": 100 },
+        "fileUrl": { "type": "string", "maxLength": 1000 },
+        "fileType": { "type": "string", "maxLength": 50 },
+        "fileSize": { "type": "string", "maxLength": 50 },
+        "driveFileId": { "type": "string", "maxLength": 200 },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "fileUrl"]
+    }
+  },
+  "firestore": {
+    "/school_info/{infoId}": {
+      "schema": "SchoolInfo",
+      "description": "General school organization and profile content"
+    },
+    "/staff/{staffId}": {
+      "schema": "StaffMember",
+      "description": "School teaching and administrative staff directory"
+    },
+    "/board_members/{memberId}": {
+      "schema": "BoardMember",
+      "description": "Basic education committee and parent network members"
+    },
+    "/news/{newsId}": {
+      "schema": "NewsPost",
+      "description": "School news, announcements, and official articles"
+    },
+    "/gallery/{albumId}": {
+      "schema": "GalleryAlbum",
+      "description": "School activity photo gallery albums"
+    },
+    "/video_gallery/{videoId}": {
+      "schema": "VideoItem",
+      "description": "School activity videos and multimedia archive"
+    },
+    "/public_documents/{docId}": {
+      "schema": "PublicDocument",
+      "description": "School public documents, reports, and administrative forms"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Staff and admin application user profiles"
+    },
+    "/admins/{adminUid}": {
+      "schema": "AdminRecord",
+      "description": "Authoritative lookup documents for administrators"
+    },
+    "/school_settings/{settingId}": {
+      "schema": "DriveSettings",
+      "description": "Central school Google Drive folder and storage settings"
+    },
+    "/site_stats/{statId}": {
+      "schema": "SiteStats",
+      "description": "Website visitor counts and hit counter metrics"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+name = "bannaree-school"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# ------------------------------------------------------------------------------
+# Cloudflare D1 Database Binding
+# ------------------------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "bannaree-db"
+database_id = "56fe1149-9b8f-4ef9-8e8e-2d3d7bda91f4"
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets
+# ------------------------------------------------------------------------------
+[vars]
+GOOGLE_CLIENT_ID = "47668985482-0m3n3vbk5nv6ijnasobfsljkr5fdjd52.apps.googleusercontent.com"
+SUPER_ADMIN_EMAIL = "director@bnr.ac.th"

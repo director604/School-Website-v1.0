@@ -1,0 +1,176 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Super Admin validation - Director only (Can read confidential Inbox, assign admins, change super admin)
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'director@bnr.ac.th' ||
+        request.auth.token.email == 'engine@bnr.ac.th' ||
+        request.auth.token.email == 'sirasit@bnr.ac.th' ||
+        request.auth.token.email == 'sirasit.p@gmail.com' ||
+        request.auth.token.email == 'SIRASIT.P@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'superadmin')
+      );
+    }
+
+    // Super Admin & General Admin validation - Admin can edit school content, but CANNOT access confidential Inbox
+    function isAdmin() {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        request.auth.token.email == 'nareeschool@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'superadmin'))
+      );
+    }
+
+    function isEditorOrAdmin() {
+      return isSignedIn() && (
+        isAdmin() ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'editor' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'teacher' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'superadmin') &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'active') == 'active')
+      );
+    }
+
+    // 1. School Information - Admin has 100% full editing power
+    match /school_info/{infoId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(infoId);
+    }
+
+    // 2. Staff Directory - Admin has 100% full editing power (Add, Edit, Delete, Reorder)
+    match /staff/{staffId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(staffId);
+    }
+
+    // 3. Board Members - Admin has 100% full editing power
+    match /board_members/{memberId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(memberId);
+    }
+
+    // 4. News & Announcements - Admin can edit/delete ANY post, Editors can manage their own
+    match /news/{newsId} {
+      allow get, list: if true;
+      allow create: if isEditorOrAdmin() && isValidId(newsId);
+      allow update: if isValidId(newsId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+      allow delete: if isValidId(newsId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+    }
+
+    // 5. Activity Photo Gallery - Admin can edit/delete ANY album, Editors can manage their own
+    match /gallery/{albumId} {
+      allow get, list: if true;
+      allow create: if isEditorOrAdmin() && isValidId(albumId);
+      allow update: if isValidId(albumId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+      allow delete: if isValidId(albumId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+    }
+
+    // 5.1 School Video Gallery - Admin can edit/delete ANY video, Editors can manage their own
+    match /video_gallery/{videoId} {
+      allow get, list: if true;
+      allow create: if isEditorOrAdmin() && isValidId(videoId);
+      allow update: if isValidId(videoId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+      allow delete: if isValidId(videoId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+    }
+
+    // 5.2 School Public Documents & SAR Reports
+    match /public_documents/{docId} {
+      allow get, list: if true;
+      allow create: if isEditorOrAdmin() && isValidId(docId);
+      allow update: if isValidId(docId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+      allow delete: if isValidId(docId) && (isAdmin() || (isEditorOrAdmin() && resource.data.authorId == request.auth.uid));
+    }
+
+    // 6. User Profiles - Admin can view and edit any user, change roles and permissions
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin() || resource.data.email == request.auth.token.email);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidId(userId);
+      allow update: if isValidId(userId) && (
+        isAdmin() || 
+        (isSignedIn() && request.auth.uid == userId && 
+         request.resource.data.role == resource.data.role && 
+         request.resource.data.status == resource.data.status)
+      );
+      allow delete: if isAdmin() && isValidId(userId);
+    }
+
+    // 7. Admin Authoritative Records - Super Admins and Admins manage
+    match /admins/{adminUid} {
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(adminUid);
+    }
+
+    // 8. School Central Settings & Google Drive Module - Admin & Staff have full control
+    match /school_settings/{settingId} {
+      allow get, list: if true;
+      allow create, update, delete: if isEditorOrAdmin() && isValidId(settingId);
+    }
+
+    // 9. Post Categories - Admin & Editors can manage
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isEditorOrAdmin() && isValidId(categoryId);
+    }
+
+    // 10. Central Media Library - Admin & Editors can upload & manage
+    match /media/{mediaId} {
+      allow get, list: if true;
+      allow create, update, delete: if isEditorOrAdmin() && isValidId(mediaId);
+    }
+
+    // 11. Website Hit Counter & Visitor Statistics
+    match /site_stats/{statId} {
+      allow get, list: if true;
+      allow create: if isValidId(statId);
+      allow update: if isValidId(statId) && (
+        isAdmin() || 
+        (statId == 'counter' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalVisits', 'todayVisits', 'lastVisitedAt', 'lastDate', 'updatedAt']))
+      );
+      allow delete: if isAdmin() && isValidId(statId);
+    }
+
+    // 12. School Contact Messages (Inbox) - Strictly Super Admin (Director) Only!
+    match /inbox_messages/{messageId} {
+      allow create: if isValidId(messageId);
+      allow get, list, update, delete: if isSuperAdmin() && isValidId(messageId);
+    }
+
+    // 13. System Settings (e.g. Roles) - Super Admin controls role config
+    match /system_settings/{settingId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSuperAdmin() && isValidId(settingId);
+    }
+
+    // 14. Connection probe
+    match /test/{testId} {
+      allow get: if true;
+    }
+  }
+}
+

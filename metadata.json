@@ -1,0 +1,8 @@
+{
+  "name": "Remix เว็บโรงเรียนบ้านนารี - Ban Naree School v.2.5.1",
+  "description": "เว็บไซต์และระบบบริหารจัดการข้อมูลโรงเรียนบ้านนารี บุคลากร คณะกรรมการ ข่าวสารประชาสัมพันธ์ เชื่อมต่อ Google Workspace",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
