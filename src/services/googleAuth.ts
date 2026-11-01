@@ -14,6 +14,7 @@ declare global {
 }
 
 export const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   import.meta.env.VITE_GOOGLE_DRIVE_CLIENT_ID ||
   '47668985482-0m3n3vbk5nv6ijnasobfsljkr5fdjd52.apps.googleusercontent.com';
 
